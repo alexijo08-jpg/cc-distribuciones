@@ -1,16 +1,28 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { catalogos } from './data/catalogos'
 import { useCatalogStore } from './store/useCatalogStore'
 
 export default function Catalogos() {
   const navigate = useNavigate()
+  const catalogos = useCatalogStore((state) => state.catalogos)
   const setSeleccionado = useCatalogStore((state) => state.setSeleccionado)
+  const scrollPosition = useCatalogStore((state) => state.scrollPosition)
+  const setScrollPosition = useCatalogStore((state) => state.setScrollPosition)
 
   const categorias = useMemo(
     () => catalogos.map((catalogo) => ({ id: catalogo.id, nombre: catalogo.nombre })),
-    []
+    [catalogos]
   )
+
+  useEffect(() => {
+    window.scrollTo({ top: scrollPosition, behavior: 'auto' })
+  }, [scrollPosition])
+
+  const handleNavigateToCatalogo = (catalogoId) => {
+    setSeleccionado(catalogoId)
+    setScrollPosition(window.scrollY)
+    navigate(`/catalogo/${catalogoId}`)
+  }
 
   return (
     <div className="space-y-10">
@@ -47,10 +59,7 @@ export default function Catalogos() {
               <p className="mt-4 text-slate-600">{catalogo.descripcion}</p>
               <div className="mt-6 flex items-center justify-between gap-3">
                 <button
-                  onClick={() => {
-                    setSeleccionado(catalogo.id)
-                    navigate(`/catalogo/${catalogo.id}`)
-                  }}
+                  onClick={() => handleNavigateToCatalogo(catalogo.id)}
                   className="inline-flex items-center justify-center rounded-2xl bg-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
                 >
                   Ver productos

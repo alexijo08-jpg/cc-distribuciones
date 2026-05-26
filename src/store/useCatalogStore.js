@@ -7,7 +7,9 @@ export const useCatalogStore = create(
     (set) => ({
       catalogos: initialCatalogos,
       seleccionado: null,
+      scrollPosition: 0,
       setSeleccionado: (id) => set({ seleccionado: id }),
+      setScrollPosition: (position) => set({ scrollPosition: position }),
       addCatalogo: (catalogo) => set((state) => ({ catalogos: [...state.catalogos, catalogo] })),
       updateCatalogo: (id, cambios) =>
         set((state) => ({

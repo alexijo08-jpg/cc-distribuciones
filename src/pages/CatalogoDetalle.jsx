@@ -1,11 +1,27 @@
-import { useMemo, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { catalogos } from '../data/catalogos'
+import { useMemo, useRef, useState } from 'react'
+import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useCatalogStore } from '../store/useCatalogStore'
 
 export default function CatalogoDetalle() {
   const { id } = useParams()
   const [busqueda, setBusqueda] = useState('')
-  const catalogo = useMemo(() => catalogos.find((item) => item.id === id), [id])
+  const touchStartX = useRef(0)
+  const navigate = useNavigate()
+  const catalogos = useCatalogStore((state) => state.catalogos)
+  const catalogo = useMemo(() => catalogos.find((item) => item.id === id), [catalogos, id])
+
+  const handleTouchStart = (event) => {
+    const touch = event.touches[0]
+    touchStartX.current = touch.clientX
+  }
+
+  const handleTouchEnd = (event) => {
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - touchStartX.current
+    if (deltaX > 80) {
+      navigate('/catalogos')
+    }
+  }
 
   if (!catalogo) {
     return (
@@ -25,7 +41,11 @@ export default function CatalogoDetalle() {
   })
 
   return (
-    <div className="space-y-10">
+    <div
+      className="space-y-10"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
